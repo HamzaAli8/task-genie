@@ -4,16 +4,24 @@ import com.hamza.taskgenie.model.User;
 import com.hamza.taskgenie.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserServiceImpl implements UserService{
 
+    @Autowired
     private UserRepository userRepository;
 
     private PasswordEncoder passwordEncoder;
@@ -25,8 +33,11 @@ public class UserServiceImpl implements UserService{
         if(userRepository.findByUsername(user.getUsername()).isPresent()){
             throw new Exception("There is already a user registered with that username");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new Exception("Database error: " + Objects.requireNonNull(e.getRootCause()).getMessage());
+        }
     }
 
     @Override
@@ -55,5 +66,10 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("User not found"));
         userRepository.delete(user);
 
+    }
+
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 }
