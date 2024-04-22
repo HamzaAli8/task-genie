@@ -7,25 +7,18 @@ import com.hamza.taskgenie.model.User;
 import com.hamza.taskgenie.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserServiceImpl implements UserService{
 
-    @Autowired
     private UserRepository userRepository;
-
     private PasswordEncoder passwordEncoder;
 
 
@@ -35,8 +28,9 @@ public class UserServiceImpl implements UserService{
         if(userRepository.findByUsername(dto.getUsername()).isPresent()){
             throw new UserAlreadyExistsException("There is already a user registered with that username");
         }
-            User user = UserMapper.convertToEntity(dto);
-            return userRepository.save(user);
+        User user = UserMapper.convertToEntity(dto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
     @Override

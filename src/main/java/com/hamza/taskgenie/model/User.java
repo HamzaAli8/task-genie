@@ -18,7 +18,6 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-
     @Column(nullable = false)
     String username;
 
