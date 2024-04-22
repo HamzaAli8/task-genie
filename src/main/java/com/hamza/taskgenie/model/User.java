@@ -1,14 +1,18 @@
 package com.hamza.taskgenie.model;
 
+import com.hamza.taskgenie.entity.BaseEntity;
 import com.hamza.taskgenie.enumerations.Role;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 
-@Data
+@Getter @Setter @ToString
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

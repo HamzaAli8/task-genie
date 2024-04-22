@@ -1,12 +1,14 @@
 package com.hamza.taskgenie.service;
 
+import com.hamza.taskgenie.Mapper.UserMapper;
+import com.hamza.taskgenie.dto.UserDTO;
+import com.hamza.taskgenie.exception.UserAlreadyExistsException;
 import com.hamza.taskgenie.model.User;
 import com.hamza.taskgenie.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,15 +31,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public User registerNewUser(User user) throws Exception {
-        if(userRepository.findByUsername(user.getUsername()).isPresent()){
-            throw new Exception("There is already a user registered with that username");
+    public User registerNewUser(UserDTO dto) {
+        if(userRepository.findByUsername(dto.getUsername()).isPresent()){
+            throw new UserAlreadyExistsException("There is already a user registered with that username");
         }
-        try {
+            User user = UserMapper.convertToEntity(dto);
             return userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new Exception("Database error: " + Objects.requireNonNull(e.getRootCause()).getMessage());
-        }
     }
 
     @Override

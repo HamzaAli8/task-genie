@@ -44,7 +44,7 @@ public class SecurityConfig {
             http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(requests -> requests
-                            .requestMatchers(new AntPathRequestMatcher("/api/users/create")).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/api/users/**")).permitAll()
                             .anyRequest().authenticated());
 //                    .httpBasic(withDefaults());
             return http.build();
