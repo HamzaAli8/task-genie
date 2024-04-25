@@ -1,17 +1,12 @@
 package com.hamza.taskgenie.service;
 
-import com.hamza.taskgenie.model.User;
 import com.hamza.taskgenie.repository.UserRepository;
 import com.hamza.taskgenie.security.SecurityUser;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 
 @AllArgsConstructor

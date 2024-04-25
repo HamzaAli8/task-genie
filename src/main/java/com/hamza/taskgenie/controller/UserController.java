@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,7 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@Validated @RequestBody UserDTO userDTO) {
-            User savedUser = userService.registerNewUser(userDTO);
+            userService.registerNewUser(userDTO);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(new ResponseDto(UserConstants.STATUS_201, UserConstants.MESSAGE_201));
@@ -47,13 +48,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            userService.login(username, password);
             return ResponseEntity.status(HttpStatus.OK)
                     .body((new ResponseDto(UserConstants.STATUS_200, UserConstants.MESSAGE_200)));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).
-                    body((new ResponseDto(UserConstants.STATUS_500,e.getMessage())));
+                    body((new ResponseDto(UserConstants.STATUS_500, e.getMessage())));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto(UserConstants.STATUS_200, e.getMessage()));
         }
     }
 

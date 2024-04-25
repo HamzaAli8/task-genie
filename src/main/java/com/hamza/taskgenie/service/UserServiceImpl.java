@@ -7,6 +7,11 @@ import com.hamza.taskgenie.model.User;
 import com.hamza.taskgenie.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +25,7 @@ public class UserServiceImpl implements UserService{
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
 
     @Override
@@ -39,15 +45,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Optional<User> login(String username, String password) throws Exception {
-        Optional<User> user = userRepository.findByUsername((username));
+    public Optional<User> login(String username, String password) {
 
-        if(user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            return user;
-        }
-        throw new Exception("Invalid username or password");
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        Authentication result = authenticationManager.authenticate(authentication);
+        SecurityContextHolder.getContext().setAuthentication(result);
 
+        return Optional.ofNullable(userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found")));
     }
+
+
 
     @Override
     public User updateUser(User user) throws Exception {
